@@ -1,49 +1,15 @@
-from tkinter import *
+from tkinter import Tk, PhotoImage, Label, Button, Frame
 from PIL import Image, ImageTk
 import os
 import sqlite3
-import dbwriter
-import income
-import expenses
-import cashroi
+from income import Income_Window
+from expenses import Expense_Window
+from cashroi import ROI_Window
+from db_connect import DB_Connect
 
+# Establish SQLite3 DB connection
+db = DB_Connect()
 
-# Delete old SQLite3 Database if existant
-if os.path.exists("my_property.db"):
-    os.remove("my_property.db")
-
-# Esatblish a connection to SQLite DB
-conn = sqlite3.connect("my_property.db")
-db_curs = conn.cursor()
-
-# Write database tables
-#table1 - Revenue
-db_curs.execute("""CREATE TABLE income (
-            rental_income integer,
-            laundry_income integer,
-            storage_income integer,
-            misc_income integer)""")
-#table2 - Expenses
-db_curs.execute("""CREATE TABLE expenses (
-            tax_exp integer,
-            insurance_exp integer,
-            utility_exp integer,
-            hoa_fees integer,
-            lawn_exp integer,
-            vacancy_exp integer,
-            repair_exp integer,
-            capex_exp integer,
-            property_man integer,
-            mortgage_integer 
-            )   """)
-
-#table3 - Investment
-db_curs.execute("""CREATE TABLE investment (
-            down_pay integer,
-            closing_cost integer,
-            rehab_cost integer,
-            misc integer
-            )""")
 
 ### Set the window ###
 root = Tk()
@@ -70,39 +36,24 @@ icon = ImageTk.PhotoImage(icon)
 
 # Income - Button
 inc_button = Button(root, text="OUR Income", font=("orbital", 20),
-                    image=icon, compound=LEFT, padx=30, pady=20,
+                    image=icon, compound="left", padx=30, pady=20,
                     wraplength=120, justify="center", borderwidth=10,
-                    command=lambda: launch_income_window())
+                    command=lambda: Income_Window(db))
 inc_button.grid(row=1, column=0, pady=75)
-
-
-def launch_income_window():
-    inc_window = income.Income_Window(db_curs)
-
 
 # Expenses - Button
 inc_button = Button(root, text="OUR Expenses", font=("orbital", 20),
-                    image=icon, compound=LEFT, padx=20, pady=20,
+                    image=icon, compound="left", padx=20, pady=20,
                     wraplength=120, justify="center", borderwidth=10,
-                    command=lambda: launch_expense_window())
+                    command=lambda: Expense_Window(db))
 inc_button.grid(row=1, column=1, pady=75)
-
-
-def launch_expense_window():
-    exp_window = expenses.Expense_Window(db_curs)
 
 
 # Calculate COCROI - Button
 calc_button = Button(root, text="Calculate OUR Cash ROI", font=("orbital", 20),
-                     image=icon, compound=LEFT, padx=135, pady=20,
+                     image=icon, compound="left", padx=135, pady=20,
                      wraplength=200, justify="center", borderwidth=10,
-                     command=lambda: launch_ROI_window())
-
-
-def launch_ROI_window():
-    ROI_window = cashroi.ROI_Window(db_curs)
-
-
+                     command=lambda: ROI_Window(db))
 calc_button.grid(row=2, column=0, columnspan=2)
 
 
