@@ -1,4 +1,4 @@
-from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL
+from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL, messagebox
 import db_connect
 
 
@@ -30,6 +30,8 @@ class Expense_Window():
         self.total_exp_box = self.__total_exp_box()
         self.calc_btn = self.__calc_btn()
         self.proceed_btn = self.__proceed_btn()
+        self.__populate_boxes()
+        self.__update_fields()
 
     def __tax_exp_lbl(self):
         label = Label(self.top, text="Monthly Tax Expense:",
@@ -159,7 +161,7 @@ class Expense_Window():
 
     def __calc_btn(self):
         button = Button(
-            self.top, text="Calculate Monthly Total Expenses", wraplength=120, padx=40, borderwidth=4, command=lambda: self.update())
+            self.top, text="Calculate Monthly Total Expenses", wraplength=120, padx=40, borderwidth=4, command=lambda: self.__update_fields())
         button.grid(row=11, column=0, pady=5, padx=5)
         return button
 
@@ -169,32 +171,71 @@ class Expense_Window():
         button.grid(row=11, column=1, padx=5, pady=20)
         return button
 
-    def update(self):
-        self.submit_calc()
-        total_value = self.query()
-        self.total_exp_box_update(total_value)
+    ########################################################
+    ##########Functions to update window fields#############
+    ########################################################
 
-    def submit_calc(self):
+    def __update_fields(self):
+        try:
+            self.__update_db()
+            self.__delete_boxes()
+            self.__populate_boxes()
+        except:
+            messagebox.showwarning(title="Input Error",
+                                   message="Only whole numbers are allowed for input!")
+            self.top.lift()
+
+    def __delete_boxes(self):
+        self.tax_exp_box.delete(0, "end")
+        self.insurance_exp_box.delete(0, "end")
+        self.utilities_exp_box.delete(0, "end")
+        self.hoa_exp_box.delete(0, "end")
+        self.lawn_exp_box.delete(0, "end")
+        self.vacancy_exp_box.delete(0, "end")
+        self.repair_exp_box.delete(0, "end")
+        self.capex_exp_box.delete(0, "end")
+        self.prop_man_exp_box.delete(0, "end")
+        self.mortgage_exp_box.delete(0, "end")
+        self.total_exp_box["state"] = NORMAL
+        self.total_exp_box.delete(0, "end")
+
+    def __populate_boxes(self):
+        recordset = self.db.expense_query()
+        record_list = [x for x in recordset[0]]
+        self.tax_exp_box.insert(0, record_list[0])
+        self.tax_exp_box.select_range(0, "end")
+        self.insurance_exp_box.insert(0, record_list[1])
+        self.utilities_exp_box.insert(0, record_list[2])
+        self.hoa_exp_box.insert(0, record_list[3])
+        self.lawn_exp_box.insert(0, record_list[4])
+        self.vacancy_exp_box.insert(0, record_list[5])
+        self.repair_exp_box.insert(0, record_list[6])
+        self.capex_exp_box.insert(0, record_list[7])
+        self.prop_man_exp_box.insert(0, record_list[8])
+        self.mortgage_exp_box.insert(0, record_list[9])
+        self.total_exp_box.insert(0, self.__get_total_expenses())
+        self.total_exp_box["state"] = DISABLED
+
+    ########################################################
+    ########## Database Calls###############################
+    ########################################################
+
+    def __update_db(self):
         expense_dict = {
-            0: self.tax_exp_box.get(),
-            1: self.insurance_exp_box.get(),
-            2: self.utilities_exp_box.get(),
-            3: self.hoa_exp_box.get(),
-            4: self.lawn_exp_box.get(),
-            5: self.vacancy_exp_box.get(),
-            6: self.repair_exp_box.get(),
-            7: self.capex_exp_box.get(),
-            8: self.prop_man_exp_box.get(),
-            9: self.mortgage_exp_box.get(),
+            0: int(self.tax_exp_box.get()),
+            1: int(self.insurance_exp_box.get()),
+            2: int(self.utilities_exp_box.get()),
+            3: int(self.hoa_exp_box.get()),
+            4: int(self.lawn_exp_box.get()),
+            5: int(self.vacancy_exp_box.get()),
+            6: int(self.repair_exp_box.get()),
+            7: int(self.capex_exp_box.get()),
+            8: int(self.prop_man_exp_box.get()),
+            9: int(self.mortgage_exp_box.get()),
         }
-        self.db.insert_expenses(expense_dict)
+        self.db.update_expenses(expense_dict)
 
-    def query(self):
+    def __get_total_expenses(self):
         recordset = self.db.expense_query()
         result = sum([int(i) for i in recordset[0]])
         return result
-
-    def total_exp_box_update(self, value):
-        self.total_exp_box["state"] = NORMAL
-        self.total_exp_box.insert(0, value)
-        self.total_exp_box["state"] = DISABLED

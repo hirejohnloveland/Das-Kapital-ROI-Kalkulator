@@ -1,8 +1,8 @@
-from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL
+from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL, messagebox
 import db_connect
 
 
-class ROI_Window():
+class Invest_Window():
     def __init__(self, db):
         self.db = db
         self.top = Toplevel()
@@ -22,6 +22,8 @@ class ROI_Window():
         self.cash_ROI_box = self.__cash_ROI_box()
         self.calc_btn = self.__calc_btn()
         self.proceed_btn = self.__proceed_btn()
+        self.__populate_boxes()
+        self.__update_fields()
 
     def __down_pay_lbl(self):
         label = Label(self.top, text="Down Payment:",
@@ -109,7 +111,7 @@ class ROI_Window():
 
     def __calc_btn(self):
         button = Button(
-            self.top, text="Calculate Total Investment", wraplength=120, padx=40, borderwidth=4, command=lambda: self.update())
+            self.top, text="Calculate Total Investment", wraplength=120, padx=40, borderwidth=4, command=lambda: self.__update_fields())
         button.grid(row=8, column=0, pady=5, padx=5)
         return button
 
@@ -119,57 +121,87 @@ class ROI_Window():
         button.grid(row=8, column=1, padx=5, pady=20)
         return button
 
-    def update(self):
+    ########################################################
+    ##########Functions to update window fields#############
+    ########################################################
+
+    def __update_fields(self):
         # Return Total Investment from DB, update box
-        self.submit_calc()
-        total_investment = self.query()
-        self.total_inv_box_update(total_investment)
+        try:
+            self.__update_db()
+            self.__delete_boxes()
+            self.__populate_boxes()
+        except:
+            messagebox.showwarning(title="Input Error",
+                                   message="Only whole numbers are allowed for input!")
+            self.top.lift()
 
-        # Return cash flow from DB, calculate annual CF, update box
-        ann_income = self.income_query() * 12
-        ann_exp = self.expense_query() * 12
-        ann_cash_flow = ann_income-ann_exp
-        self.cash_flow_box_update(ann_cash_flow)
-        cash_ROI = ann_cash_flow / total_investment
-        print(cash_ROI)
-        cash_ROI_string = "{:.2%}".format(cash_ROI)
-        self.cash_ROI_box_update(cash_ROI_string)
+    def __delete_boxes(self):
+        self.down_pay_box.delete(0, "end")
+        self.close_cost_box.delete(0, "end")
+        self.rehab_exp_box.delete(0, "end")
+        self.misc_exp_box.delete(0, "end")
+        self.total_inv_box["state"] = NORMAL
+        self.total_inv_box.delete(0, "end")
+        self.cash_flow_box["state"] = NORMAL
+        self.cash_flow_box.delete(0, "end")
+        self.cash_ROI_box["state"] = NORMAL
+        self.cash_ROI_box.delete(0, "end")
 
-    def submit_calc(self):
+    def __populate_boxes(self):
+        recordset = self.db.investment_query()
+        record_list = [x for x in recordset[0]]
+        self.down_pay_box.insert(0, record_list[0])
+        self.down_pay_box.select_range(0, "end")
+        self.close_cost_box.insert(0, record_list[1])
+        self.rehab_exp_box.insert(0, record_list[2])
+        self.misc_exp_box.insert(0, record_list[3])
+        self.total_inv_box.insert(0, self.__query_db())
+        self.total_inv_box["state"] = DISABLED
+        self.cash_flow_box.insert(0, self.__get_cash_flow())
+        self.cash_flow_box["state"] = DISABLED
+        self.cash_ROI_box.insert(0, self.__get_cash_ROI())
+        self.cash_ROI_box["state"] = DISABLED
+
+    ########################################################
+    ########## Database Calls###############################
+    ########################################################
+
+    def __update_db(self):
         investment_dict = {
-            0: self.down_pay_box.get(),
-            1: self.close_cost_box.get(),
-            2: self.rehab_exp_box.get(),
-            3: self.misc_exp_box.get()
+            0: int(self.down_pay_box.get()),
+            1: int(self.close_cost_box.get()),
+            2: int(self.rehab_exp_box.get()),
+            3: int(self.misc_exp_box.get())
         }
-        self.db.insert_investment(investment_dict)
+        self.db.update_investment(investment_dict)
 
-    def query(self):
+    def __query_db(self):
         recordset = self.db.investment_query()
         result = sum([int(i) for i in recordset[0]])
         return result
 
-    def income_query(self):
+    def __income_query(self):
         recordset = self.db.income_query()
         result = sum([int(i) for i in recordset[0]])
         return result
 
-    def expense_query(self):
+    def __expense_query(self):
         recordset = self.db.expense_query()
         result = sum([int(i) for i in recordset[0]])
         return result
 
-    def total_inv_box_update(self, value):
-        self.total_inv_box["state"] = NORMAL
-        self.total_inv_box.insert(0, value)
-        self.total_inv_box["state"] = DISABLED
+    # Return cash flow from DB, calculate annual CF, update box
+    def __get_cash_flow(self):
+        annual_income = self.__income_query() * 12
+        annual_exp = self.__expense_query() * 12
+        annual_cash_flow = annual_income-annual_exp
+        return annual_cash_flow
 
-    def cash_flow_box_update(self, value):
-        self.cash_flow_box["state"] = NORMAL
-        self.cash_flow_box.insert(0, value)
-        self.cash_flow_box["state"] = DISABLED
-
-    def cash_ROI_box_update(self, value):
-        self.cash_ROI_box["state"] = NORMAL
-        self.cash_ROI_box.insert(0, value)
-        self.cash_ROI_box["state"] = DISABLED
+    def __get_cash_ROI(self):
+        try:
+            cash_ROI = self.__get_cash_flow() / self.__query_db()
+        except:
+            cash_ROI = 1
+        cash_ROI_string = "{:.2%}".format(cash_ROI)
+        return cash_ROI_string

@@ -10,6 +10,7 @@ class DB_Connect():
         self.connection = self.__get_connect()
         self.cursor = self.__get_cursor(self.connection)
         self.__write_tables()
+        self.__write_zero_rows()
 
     ####################################################################
     ############Private methods to establish db connect/cursor##########
@@ -58,7 +59,7 @@ class DB_Connect():
             repair_exp integer,
             capex_exp integer,
             property_man integer,
-            mortgage_integer 
+            mortgage_exp integer 
             )   """)
 
             # table3 - Investment
@@ -71,6 +72,7 @@ class DB_Connect():
     ####################################################################
     ############Public methods to add data to database##################
     ####################################################################
+    # Will need to handle oid on extension
 
     def insert_income(self, income_fields: dict):
         """Inserts new record into the income table, takes a dictionary with the following values in
@@ -80,6 +82,27 @@ class DB_Connect():
         2: storage income
         3: misc income"""
         self.cursor.execute("INSERT INTO income VALUES (:rental_inc, :laund_inc, :stor_inc, :misc_inc)",
+                            {
+                                'rental_inc': income_fields[0],
+                                'laund_inc': income_fields[1],
+                                'stor_inc': income_fields[2],
+                                'misc_inc': income_fields[3]
+                            })
+
+    # oid is set to one automatically until extension
+    def update_income(self, income_fields: dict):
+        """Updates the current record (CURRENTLY OID=1 until extension) with input from the boxes
+        0: rental income 
+        1: laundry income
+        2: storage income
+        3: misc income"""
+        self.cursor.execute("""UPDATE income SET
+                    rental_income = :rental_inc,
+                    laundry_income = :laund_inc,
+                    storage_income = :stor_inc,
+                    misc_income = :misc_inc
+
+                    WHERE oid = 1""",
                             {
                                 'rental_inc': income_fields[0],
                                 'laund_inc': income_fields[1],
@@ -114,6 +137,45 @@ class DB_Connect():
                                 "mort": expense_fields[9],
                             })
 
+    # oid is set to one automatically until extension
+    def update_expenses(self, expense_fields: dict):
+        """Updates the current record (CURRENTLY OID=1 until extension) with input from the boxes
+        0: tax expense
+        1: insurance expense
+        2: utility expense
+        3: hoa expense
+        4: lawn expense
+        5: vacancy expense
+        6: repair expense
+        7: capital expense
+        8: property management expense
+        9: mortgage expense"""
+        self.cursor.execute("""UPDATE expenses SET
+                    tax_exp = :tax,
+                    insurance_exp = :ins,
+                    utility_exp = :util,
+                    hoa_fees = :hoa,
+                    lawn_exp = :lawn,
+                    vacancy_exp = :vac,
+                    repair_exp = :rep,
+                    capex_exp = :capex,
+                    property_man = :mgmt,
+                    mortgage_exp = :mort 
+
+                    WHERE oid = 1""",
+                            {
+                                "tax": expense_fields[0],
+                                "ins": expense_fields[1],
+                                "util": expense_fields[2],
+                                "hoa": expense_fields[3],
+                                "lawn": expense_fields[4],
+                                "vac": expense_fields[5],
+                                "rep": expense_fields[6],
+                                "capex": expense_fields[7],
+                                "mgmt": expense_fields[8],
+                                "mort": expense_fields[9],
+                            })
+
     def insert_investment(self, investment_fields: dict):
         """Inserts new record into the investment table, takes a dictionary with the following values in
         in order, 
@@ -122,6 +184,29 @@ class DB_Connect():
         2: rehabilitation expense
         3: misc expense"""
         self.cursor.execute("INSERT INTO investment VALUES (:dp,:close,:rehab,:misc)",
+                            {
+                                "dp": investment_fields[0],
+                                "close": investment_fields[1],
+                                "rehab": investment_fields[2],
+                                "misc": investment_fields[3]
+                            })
+
+    # oid is set to one automatically until extension
+
+    def update_investment(self, investment_fields: dict):
+        """Updates the current record (CURRENTLY OID=1 until extension) with input from the boxes
+        in order, 
+        0: down payment
+        1: closing cost
+        2: rehabilitation expense
+        3: misc expense"""
+        self.cursor.execute("""UPDATE investment SET
+                    down_payment = :dp,
+                    closing_costs = :close,
+                    rehab_expense = :rehab,
+                    misc_investment = :misc
+
+                    WHERE oid = 1""",
                             {
                                 "dp": investment_fields[0],
                                 "close": investment_fields[1],
@@ -153,3 +238,38 @@ class DB_Connect():
         self.cursor.execute("SELECT * FROM investment")
         recordset = self.cursor.fetchall()
         return recordset
+
+    ###################################################################
+    #### Pre-Extension methods to enable single record operation#######
+    ###################################################################
+    # inserts a zero row with an OID of 1 at the start of database, remove when extending
+    def __write_zero_rows(self):
+        income_zero_dict = {
+            0: 0,
+            1: 0,
+            2: 0,
+            3: 0
+        }
+        self.insert_income(income_zero_dict)
+
+        expense_zero_dict = {
+            0: 0,
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+            6: 0,
+            7: 0,
+            8: 0,
+            9: 0
+        }
+        self.insert_expenses(expense_zero_dict)
+
+        invest_zero_dict = {
+            0: 0,
+            1: 0,
+            2: 0,
+            3: 0
+        }
+        self.insert_investment(invest_zero_dict)

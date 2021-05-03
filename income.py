@@ -1,8 +1,10 @@
-from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL
+from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL, messagebox
 import db_connect
 
 
 class Income_Window():
+    """Create the income window and it's fields and methods"""
+
     def __init__(self, db):
         self.db = db
         self.top = Toplevel()
@@ -18,6 +20,8 @@ class Income_Window():
         self.total_inc_box = self.__total_inc_box()
         self.calc_btn = self.__calc_btn()
         self.proceed_btn = self.__proceed_btn()
+        self.__populate_boxes()
+        self.__update_fields()
 
     def __rental_inc_lbl(self):
         label = Label(self.top, text="Monthly Rental Income:",
@@ -79,7 +83,7 @@ class Income_Window():
 
     def __calc_btn(self):
         button = Button(
-            self.top, text="Calculate Monthly Total Income", wraplength=120, padx=40, borderwidth=4, command=lambda: self.update())
+            self.top, text="Calculate Monthly Total Income", wraplength=120, padx=40, borderwidth=4, command=lambda: self.__update_fields())
         button.grid(row=6, column=0, pady=5, padx=5)
         return button
 
@@ -89,26 +93,53 @@ class Income_Window():
         button.grid(row=6, column=1, padx=5, pady=20)
         return button
 
-    def update(self):
-        self.submit_calc()
-        total_value = self.query()
-        self.total_inc_box_update(total_value)
+    ########################################################
+    ##########Functions to update window fields#############
+    ########################################################
 
-    def submit_calc(self):
-        income_dict = {
-            0: self.rental_inc_box.get(),
-            1: self.laundry_inc_box.get(),
-            2: self.storage_inc_box.get(),
-            3: self.misc_inc_box.get()
-        }
-        self.db.insert_income(income_dict)
+    def __update_fields(self):
+        try:
+            self.__update_db()
+            self.__delete_boxes()
+            self.__populate_boxes()
+        except:
+            messagebox.showwarning(title="Input Error",
+                                   message="Only whole numbers are allowed for input!")
+            self.top.lift()
 
-    def query(self):
+    def __populate_boxes(self):
+        recordset = self.db.income_query()
+        record_list = [x for x in recordset[0]]
+        self.rental_inc_box.insert(0, record_list[0])
+        self.rental_inc_box.select_range(0, "end")
+        self.laundry_inc_box.insert(0, record_list[1])
+        self.storage_inc_box.insert(0, record_list[2])
+        self.misc_inc_box.insert(0, record_list[3])
+        self.total_inc_box.insert(0, self.__get_total_income())
+        self.total_inc_box["state"] = DISABLED
+
+    def __delete_boxes(self):
+        self.rental_inc_box.delete(0, "end")
+        self.laundry_inc_box.delete(0, "end")
+        self.storage_inc_box.delete(0, "end")
+        self.misc_inc_box.delete(0, "end")
+        self.total_inc_box["state"] = NORMAL
+        self.total_inc_box.delete(0, "end")
+
+    ########################################################
+    ########## Database Calls###############################
+    ########################################################
+
+    def __get_total_income(self):
         recordset = self.db.income_query()
         result = sum([int(i) for i in recordset[0]])
         return result
 
-    def total_inc_box_update(self, value):
-        self.total_inc_box["state"] = NORMAL
-        self.total_inc_box.insert(0, value)
-        self.total_inc_box["state"] = DISABLED
+    def __update_db(self):
+        income_dict = {
+            0: int(self.rental_inc_box.get()),
+            1: int(self.laundry_inc_box.get()),
+            2: int(self.storage_inc_box.get()),
+            3: int(self.misc_inc_box.get())
+        }
+        self.db.update_income(income_dict)
