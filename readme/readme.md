@@ -27,10 +27,10 @@ The user interface is a button driven GUI which launces a series of windows wher
 ![Main Window](https://github.com/hirejohnloveland/Das-Kapital-ROI-Kalkulator/blob/main/readme/Main_Screen.JPG "Main window")
 
 ### Income Window
-![Income Window](Income_window.JPG "Income window")
+![Income Window](https://github.com/hirejohnloveland/Das-Kapital-ROI-Kalkulator/blob/main/readme/Income_Window.JPG "Income window")
 
 ### Expense Window
-![Expense Window](Expense_window.JPG "Expense window")
+![Expense Window](https://github.com/hirejohnloveland/Das-Kapital-ROI-Kalkulator/blob/main/readme/Expense_Window.JPG "Expense window")
 
 ### ROI Window
-![ROI Window](ROI_window.JPG "ROI window")
+![ROI Window](https://github.com/hirejohnloveland/Das-Kapital-ROI-Kalkulator/blob/main/readme/ROI_Window.JPG "ROI window")
