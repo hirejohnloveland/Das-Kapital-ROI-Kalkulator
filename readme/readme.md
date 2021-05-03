@@ -24,7 +24,7 @@ Comments where necessary to explain program function
 The user interface is a button driven GUI which launces a series of windows where users enter data and perform calculations using buttons.
 
 ### Main Window
-![Main Window](Main_screen.JPG "Main window")
+![Main Window](https://github.com/hirejohnloveland/Das-Kapital-ROI-Kalkulator/blob/main/readme/Main_Screen.JPG "Main window")
 
 ### Income Window
 ![Income Window](Income_window.JPG "Income window")
