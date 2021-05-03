@@ -2,7 +2,7 @@
 ### Modernize OUR return, Post-modernize OUR aesthetics
 ### Version 1.0, Release Date - 5/3/21
 
-Das Kapital is an ironically themed return on investment calculator for landlords built with the ancient looking Tcl/Tk GUI library. Don't let the irony fool you though, while communism might look better than it works, this calculator works better than it looks.  
+Das Kapital is an ironically themed ROI (Return On Investment) calculator for landlords built with the ancient looking Tcl/Tk GUI library. Don't let the irony fool you though, while communism might look better than it works, this calculator works better than it looks.  
 
 ### Technical Features
 Developed in Python using Tkinter, a Python GUI built on the Tcl/Tk library.  
