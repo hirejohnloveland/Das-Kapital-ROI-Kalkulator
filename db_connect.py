@@ -21,15 +21,15 @@ class DB_Connect():
         # Delete old SQLite3 Database if existant, this is for
         # a single record project, when extending for multi-property
         # this code needs to be modified
-        if os.path.exists("my_property.db"):
-            os.remove("my_property.db")  # delete when extending
+        if os.path.exists("database/my_property.db"):
+            os.remove("database/my_property.db")  # delete when extending
             return True
         else:
             return True  # change to False when extening
 
     # Esatblish a connection to SQLite DB / create new instance
     def __get_connect(self):
-        connection = sqlite3.connect("my_property.db")
+        connection = sqlite3.connect("database/my_property.db")
         return connection
 
     # Establish a cursor for operations

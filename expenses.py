@@ -1,4 +1,4 @@
-from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL, messagebox
+from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL, messagebox, PhotoImage
 import db_connect
 
 
@@ -6,6 +6,7 @@ class Expense_Window():
     def __init__(self, db):
         self.db = db
         self.top = Toplevel()
+        self.__draw_window()
         self.tax_exp_lbl = self.__tax_exp_lbl()
         self.tax_exp_box = self.__tax_exp_box()
         self.insurance_exp_lbl = self.__insurance_exp_lbl()
@@ -32,6 +33,11 @@ class Expense_Window():
         self.proceed_btn = self.__proceed_btn()
         self.__populate_boxes()
         self.__update_fields()
+
+    def __draw_window(self):
+        self.top.title(
+            "Enter OUR Expenses")
+        self.top.iconphoto(False, PhotoImage(file="img/commie.png"))
 
     def __tax_exp_lbl(self):
         label = Label(self.top, text="Monthly Tax Expense:",

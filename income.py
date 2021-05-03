@@ -1,4 +1,4 @@
-from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL, messagebox
+from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL, messagebox, PhotoImage
 import db_connect
 
 
@@ -8,6 +8,7 @@ class Income_Window():
     def __init__(self, db):
         self.db = db
         self.top = Toplevel()
+        self.__draw_window()
         self.rental_inc_lbl = self.__rental_inc_lbl()
         self.rental_inc_box = self.__rental_inc_box()
         self.laundry_inc_lbl = self.__laundry_inc_lbl()
@@ -22,6 +23,11 @@ class Income_Window():
         self.proceed_btn = self.__proceed_btn()
         self.__populate_boxes()
         self.__update_fields()
+
+    def __draw_window(self):
+        self.top.title(
+            "Enter OUR Income")
+        self.top.iconphoto(False, PhotoImage(file="img/commie.png"))
 
     def __rental_inc_lbl(self):
         label = Label(self.top, text="Monthly Rental Income:",
@@ -143,4 +149,3 @@ class Income_Window():
             3: int(self.misc_inc_box.get())
         }
         self.db.update_income(income_dict)
-        self.db.update_income()

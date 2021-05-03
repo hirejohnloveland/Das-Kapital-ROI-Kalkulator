@@ -1,4 +1,4 @@
-from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL, messagebox
+from tkinter import Label, Entry, Button, Toplevel, E, W, DISABLED, NORMAL, messagebox, PhotoImage
 import db_connect
 
 
@@ -6,6 +6,7 @@ class Invest_Window():
     def __init__(self, db):
         self.db = db
         self.top = Toplevel()
+        self.__draw_window()
         self.down_pay_lbl = self.__down_pay_lbl()
         self.down_pay_box = self.__down_pay_box()
         self.close_cost_lbl = self.__close_cost_lbl()
@@ -24,6 +25,11 @@ class Invest_Window():
         self.proceed_btn = self.__proceed_btn()
         self.__populate_boxes()
         self.__update_fields()
+
+    def __draw_window(self):
+        self.top.title(
+            "Calculate OUR ROI")
+        self.top.iconphoto(False, PhotoImage(file="img/commie.png"))
 
     def __down_pay_lbl(self):
         label = Label(self.top, text="Down Payment:",
