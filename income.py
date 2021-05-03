@@ -143,3 +143,4 @@ class Income_Window():
             3: int(self.misc_inc_box.get())
         }
         self.db.update_income(income_dict)
+        self.db.update_income()

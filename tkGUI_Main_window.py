@@ -31,7 +31,6 @@ class GUI():
         self.root.iconphoto(False, PhotoImage(file="img/commie.png"))
 
     # Generate the splash
-
     def __draw_splash_image(self):
         splash_img = Image.open('img/splash.jpg')
         splash_img = ImageTk.PhotoImage(splash_img)
