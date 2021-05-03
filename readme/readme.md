@@ -1,5 +1,5 @@
-#Das Kapital - The People's ROI Calculator
-##Modernize OUR return, Post-modernize OUR aesthetics
+###Das Kapital - The People's ROI Calculator
+###odernize OUR return, Post-modernize OUR aesthetics
 ### Version 1.0, Release Date - 5/3/21
 
 Das Kapital is an ironically themed return on investment calculator for landlords built with the ancient looking Tcl/Tk GUI library. Don't let the irony fool you though, while communism might look better than it works, this calculator works better than it looks.  
