@@ -13,7 +13,7 @@ class DB_Connect():
         self.__write_zero_rows()
 
     ####################################################################
-    ############Private methods to establish db connect/cursor##########
+    ########### Private methods to establish db connect/cursor #########
     ####################################################################
 
     # check if data exists
