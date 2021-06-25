@@ -18,7 +18,7 @@ class DB_Connect():
 
     # check if data exists
     def __is_new_instance(self):
-        # Delete old SQLite3 Database if existant, this is for
+        # Delete old SQLite3 Database if existant, this is
         # a single record project, when extending for multi-property
         # this code needs to be modified
         if os.path.exists("database/my_property.db"):
